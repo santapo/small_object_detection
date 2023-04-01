@@ -5,11 +5,13 @@ from utils.utils import get_slices
 
 
 class ObjectDetector:
-    def __init__(self):
-        ...
+    def __init__(self, model_name):
+        self.model = torch.hub.load('ultralytics/yolov5', model_name)
 
     def predict(self, images: list[np.ndarray]):
-        ...
+        results = self.model(images).pred
+        final_results = np.array(result.cpu().numpy() for result in results)
+        return final_results
 
     def predict_slices(self, image: np.ndarray):
         slices = get_slices(image)
