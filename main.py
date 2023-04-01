@@ -10,7 +10,7 @@ class ObjectDetector:
 
     def predict(self, images: list[np.ndarray]):
         results = self.model(images).pred
-        final_results = np.array([result.cpu().numpy() for result in results])
+        final_results = [result.cpu().numpy() for result in results]
         return final_results
 
     def predict_slices(self, image: np.ndarray):
