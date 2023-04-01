@@ -36,5 +36,4 @@ def draw_bbox(image: np.ndarray, bboxes: np.ndarray) -> np.ndarray:
         labelSize = cv2.getTextSize(text, fontFace, fontScale, 1)
         img = cv2.rectangle(img, (x1, y1 - labelSize[0][1]), (x1+labelSize[0][0], y1), (60,60,60), cv2.FILLED)
         img = cv2.putText(img, text, start_point, fontFace, fontScale, (0,255,0), thickness=1)
-        print(text)
     return img
