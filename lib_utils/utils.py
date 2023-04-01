@@ -23,18 +23,18 @@ def nmm(bboxes: np.ndarray, iou_thres: float):
     ...
 
 def draw_bbox(image: np.ndarray, bboxes: np.ndarray) -> np.ndarray:
-    img = image
+    img = image.copy()
     fontFace = cv2.FONT_HERSHEY_COMPLEX
     fontScale = 0.5
-    for i in range(bboxes.shape[0]):   
+    for i in range(bboxes.shape[0]):
         x1 = int(bboxes[i,0])
         y1 = int(bboxes[i,1])
-        w = int(bboxes[i,2])
-        h = int(bboxes[i,3])
-        text =  str(int(bboxes[i,4])) + ' ' + str(bboxes[i,5])
+        x2 = int(bboxes[i,2])
+        y2 = int(bboxes[i,3])
+        text =  str(int(bboxes[i,5])) + ' ' + str(round(bboxes[i,4], 2))
         labelSize = cv2.getTextSize(text, fontFace, fontScale, 1)
         start_point = (x1, y1)
-        end_point = (x1 + w, y1 + h)
+        end_point = (x2, y2)
         img = cv2.rectangle(img, start_point, end_point,(255,0,0), 2)
         labelSize = cv2.getTextSize(text, fontFace, fontScale, 1)
         img = cv2.rectangle(img, (x1, y1 - labelSize[0][1]), (x1+labelSize[0][0], y1), (60,60,60), cv2.FILLED)

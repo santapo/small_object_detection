@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from utils.utils import get_slices
+from lib_utils.utils import get_slices
 
 
 class ObjectDetector:
@@ -14,12 +14,23 @@ class ObjectDetector:
         return final_results
 
     def predict_slices(self, image: np.ndarray):
-        slices = get_slices(image)
+        slices = get_slices(image, 320, 320, 0.2)
         all_res = []
         for (start_y, start_x), slice in slices:
-            res = self.predict(slice)
-            res[:, 0] += start_y
-            res[:, 1] += start_x
+            # import ipdb; ipdb.set_trace()
+            res = self.predict(slice)[0]
+            res[:, 0] += start_x
+            res[:, 1] += start_y
+            res[:, 2] += start_x
+            res[:, 3] += start_y
             all_res.append(res)
         all_res = np.concatenate(all_res, axis=0)
         return all_res
+
+
+if __name__ == "__main__":
+    import cv2
+    img = img = cv2.imread("/home/aivn48/.santapo/sod/tests/small-vehicles1.jpeg")
+    detector = ObjectDetector("yolov5s")
+    slice_res = detector.predict_slices(img)
+    # res = detector.predict(img)
