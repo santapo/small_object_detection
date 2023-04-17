@@ -19,6 +19,18 @@ def get_slices(image: np.ndarray, slice_width: int, slice_height: int, overlappe
                   window.append(((y, x), image[y:y + slice_width, x:x + slice_height,:]))
     return window
 
+@jit(nopython=True)
+def get_slices_new(image: np.ndarray, slice_width: int, slice_height: int, overlapped_ratio: float) -> list[np.ndarray]:
+    h, w = image.shape[:2]
+    stepSizeY = int(slice_height - slice_height*overlapped_ratio)
+    stepSizeX = int(slice_width - slice_width*overlapped_ratio)
+    a = np.arange(0,h, stepSizeX)
+    a[-1] = h - slice_height
+    b = np.arange(0,w, stepSizeY)
+    b[-1] = w - slice_width
+    lst = [image[i:i+slice_height, j:j+slice_width, :] for i in a for j in b]
+    return lst
+
 def nmm(bboxes: np.ndarray, iou_thres: float):
     ...
 
