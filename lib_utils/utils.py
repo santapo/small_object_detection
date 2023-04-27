@@ -32,8 +32,46 @@ def get_slices_new(image: np.ndarray, slice_width: int, slice_height: int, overl
     return lst
 
 def nmm(bboxes: np.ndarray, iou_thres: float):
-    ...
+    selected_bboxes = []
 
+    x = bboxes[:, 0]
+    y = bboxes[:, 1]
+    w = bboxes[:, 2]
+    h = bboxes[:, 3]
+    confidence_scores = bboxes[:, 4]
+    class_labels = bboxes[:, 5]
+    areas = w * h
+
+    sorted_indices = np.argsort(confidence_scores)[::-1]
+    sorted_bboxes = bboxes[sorted_indices]
+
+    while len(sorted_bboxes) > 0:
+        current_bbox = sorted_bboxes[0]
+        selected_bboxes.append(current_bbox)
+
+        ious = compute_iou(current_bbox, sorted_bboxes[1:])
+
+        suppress_indices = np.where(ious > iou_thres)[0] + 1
+
+        sorted_bboxes = np.delete(sorted_bboxes, suppress_indices, axis=0)
+
+    selected_bboxes = np.stack(selected_bboxes)
+    return selected_bboxes
+
+def compute_iou(bbox, bboxes):
+    x1 = np.maximum(bbox[0], bboxes[:, 0])
+    y1 = np.maximum(bbox[1], bboxes[:, 1])
+    x2 = np.minimum(bbox[0] + bbox[2], bboxes[:, 0] + bboxes[:, 2])
+    y2 = np.minimum(bbox[1] + bbox[3], bboxes[:, 1] + bboxes[:, 3])
+    intersection_areas = np.maximum(0, x2 - x1) * np.maximum(0, y2 - y1)
+
+    bbox_area = bbox[2] * bbox[3]
+    bboxes_areas = bboxes[:, 2] * bboxes[:, 3]
+    union_areas = bbox_area + bboxes_areas - intersection_areas
+
+    ious = intersection_areas / union_areas
+
+    return ious
 def draw_bbox(image: np.ndarray, bboxes: np.ndarray) -> np.ndarray:
     img = image.copy()
     fontFace = cv2.FONT_HERSHEY_COMPLEX
