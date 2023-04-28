@@ -32,8 +32,19 @@ class ObjectDetector:
         final_results = [result.cpu() for result in results]
         return final_results
 
-    def predict_slices(self, image: np.ndarray):
-        slices = get_slices(image, 320, 320, 0.2)
+    def predict_slices(
+            self,
+            image: np.ndarray,
+            slice_width: int,
+            slice_height: int,
+            overlap_ratio: float
+        ):
+        slices = get_slices(
+            image,
+            slice_width,
+            slice_height,
+            overlap_ratio
+        )
         all_res = []
         for (start_y, start_x), slice in slices:
             res = self.predict(slice)[0]
@@ -57,10 +68,10 @@ if __name__ == "__main__":
     import cv2
 
     from lib_utils.utils import draw_bbox
-    img = img = cv2.imread("tests/small-vehicles1.jpeg")
+    img = cv2.imread("tests/small-vehicles1.jpeg")
     detector = ObjectDetector("yolov5s")
-    slice_res = detector.predict_slices(img)
-    # slice_res = detector.predict(img)[0]
+    # slice_res = detector.predict_slices(img)
+    slice_res = detector.predict(img)[0].numpy()
     img = draw_bbox(img, slice_res)
     cv2.imwrite("test1.jpg", img)
 
