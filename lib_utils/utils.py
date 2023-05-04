@@ -2,37 +2,16 @@ import cv2
 import numpy as np
 from torchvision import ops
 
-
-def get_slices(image: np.ndarray, slice_width: int, slice_height: int, overlapped_ratio: float) -> list[np.ndarray]:
-    window = []
+def get_slices_new(image: np.ndarray, slice_width: int, slice_height: int, overlapped_ratio: float) -> list[np.ndarray]:
     h, w = image.shape[:2]
     stepSizeY = int(slice_height - slice_height*overlapped_ratio)
     stepSizeX = int(slice_width - slice_width*overlapped_ratio)
-    for y in range(0, image.shape[0], stepSizeY):
-        for x in range(0, image.shape[1], stepSizeX):
-            if w-x < stepSizeX and h-y < stepSizeY:
-                window.append(((h-slice_height, w-slice_width), image[h-slice_height:h, w-slice_width:w, :]))
-            elif w-x < stepSizeX:
-                  window.append(((y, w-slice_width), image[y:y + slice_width, w-slice_width:w, :]))
-            elif h-y < stepSizeY:
-                  window.append(((h-slice_height, x), image[h-slice_height:h, x:x + slice_height,:]))
-            else:
-                  window.append(((y, x), image[y:y + slice_width, x:x + slice_height,:]))
-    return window
-
-
-# @jit(nopython=True)
-# def get_slices_new(image: np.ndarray, slice_width: int, slice_height: int, overlapped_ratio: float) -> list[np.ndarray]:
-#     h, w = image.shape[:2]
-#     stepSizeY = int(slice_height - slice_height*overlapped_ratio)
-#     stepSizeX = int(slice_width - slice_width*overlapped_ratio)
-#     a = np.arange(0,h, stepSizeX)
-#     a[-1] = h - slice_height
-#     b = np.arange(0,w, stepSizeY)
-#     b[-1] = w - slice_width
-#     lst = [image[i:i+slice_height, j:j+slice_width, :] for i in a for j in b]
-#     return lst
-
+    a = np.arange(0,h-slice_height, stepSizeY)
+    a = np.append(a, h-slice_height)
+    b = np.arange(0,w-slice_width, stepSizeX)
+    b = np.append(b, w-slice_width)
+    lst = [image[i:i+slice_height, j:j+slice_width, :] for i in a for j in b]
+    return lst
 
 def draw_bbox(image: np.ndarray, bboxes: np.ndarray) -> np.ndarray:
     img = image.copy()
